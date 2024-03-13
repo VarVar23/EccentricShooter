@@ -1,67 +1,96 @@
 using Colyseus.Schema;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyController : MonoBehaviour
 {
-    private SmoothMovement _smoothMovement; //
+    [SerializeField] private EnemyCharacter _character;
+    [SerializeField] private EnemyGun _enemyGun;
+    private Player _player;
+    private List<float> _timeInterval = new List<float>() { 0, 0, 0, 0, 0 };
+    private float AverageInterval
+    {
+        get
+        {
+            int length = _timeInterval.Count;
+            float summ = 0;
 
-    private void Awake() => _smoothMovement = new SmoothMovement(this); //
+            for(int i = 0; i < length; i++)
+            {
+                summ += _timeInterval[i];
+            }
+
+            return summ / length;
+        }
+    }
+
+    private float _lastTime = 0;
+
+    public void Init(Player player)
+    {
+        _player = player;
+        _character.SetSpeed(_player.speed);
+        player.OnChange += OnChange;
+    }
+
+    public void Shoot(in ShootInfo info)
+    {
+        Vector3 position = new Vector3(info.pX, info.pY, info.pZ);
+        Vector3 velocity = new Vector3(info.dX, info.dY, info.dZ);
+
+        _enemyGun.Shoot(position, velocity);
+    }
+
+    public void Destroy()
+    {
+        _player.OnChange -= OnChange;
+        Destroy(gameObject);
+    }
+
+    private void SaveTime()
+    {
+        float interval = Time.time - _lastTime;
+        _lastTime = Time.time;
+
+        _timeInterval.Add(interval);
+        _timeInterval.RemoveAt(0);
+    }
 
     internal void OnChange(List<DataChange> changes)
     {
-        Vector3 position = transform.position;
+        SaveTime();
+
+        Vector3 position = _character.TargetPosition;
+        Vector3 velocity = _character.Velocity;
 
         foreach (DataChange change in changes)
         {
             switch(change.Field)
             {
-                case "x":
-                    position.x = (float)change.Value;
+                case "pX": position.x = (float)change.Value;
                     break;
-                case "y":
-                    position.z = (float)change.Value;
+                case "pY": position.y = (float)change.Value;
+                    break;
+                case "pZ": position.z = (float)change.Value;
+                    break;
+                case "vX": velocity.x = (float)change.Value;
+                    break;
+                case "vY": velocity.y = (float)change.Value;
+                    break;
+                case "vZ": velocity.z = (float)change.Value;
+                    break;
+                case "rX":
+                    _character.SetRotateX((float)change.Value);
+                    break;
+                case "rY":
+                    _character.SetRotateY((float)change.Value);
                     break;
                 default:
                     Debug.LogWarning("Что-то пошло не так :)");
                     break;
             }
-
-            _smoothMovement.ChangePosition(transform, position); //
         }
-    }
-}
 
-public class SmoothMovement // Создал класс, который будет отвечать за сглаживание движения
-{
-    private MonoBehaviour _monoBeh; // Нужен для запуска корутин (в теории, можно обойтись и без него, смотря какая архитектура)
-    private Transform _moveObject; // Объект, который будет перемещаться
-    private Vector3 _nextPosition; // Точка, куда будет перемещаться объект
-    private IEnumerator _corutine; // Корутина, для остановки предыдущей (возможно, лучше заменить на Update, нужно смотреть в профайлере)
-
-    private const float _speed = 10; // Должно брать из Model скорость игрока. Для теста захардкодил
-
-    public SmoothMovement(MonoBehaviour monoBeh) => _monoBeh = monoBeh; 
-
-    public void ChangePosition(Transform moveObject, Vector3 nextPosition)
-    {
-        _moveObject = moveObject;
-        _nextPosition = nextPosition;
-
-        if (_corutine != null)
-            _monoBeh.StopCoroutine(_corutine);
-
-        _corutine = Movement();
-        _monoBeh.StartCoroutine(_corutine);
-    }
-
-    private IEnumerator Movement()
-    {
-        while (!Mathf.Equals(_moveObject.position, _nextPosition))
-        {
-            _moveObject.position = Vector3.MoveTowards(_moveObject.position, _nextPosition, _speed * Time.deltaTime);
-            yield return null;
-        }
+        _character.SetMovement(position, velocity, AverageInterval);
     }
 }

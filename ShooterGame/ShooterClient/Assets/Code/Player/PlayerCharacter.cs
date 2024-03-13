@@ -1,28 +1,81 @@
 using UnityEngine;
 
-public class PlayerCharacter : MonoBehaviour
+public class PlayerCharacter : Character
 {
-    [SerializeField] private float _speed;
+    [SerializeField] private CheckFly _checkFly;
+    [SerializeField] private Transform _head;
+    [SerializeField] private Transform _cameraPoint;
     [SerializeField] private Transform _playerTranform;
-    private Vector3 _direction;
+    [SerializeField] private Rigidbody _rigidbody;
 
-    private void Update()
+    [SerializeField] private float _maxAngle = 50;
+    [SerializeField] private float _minAngle = -70;
+    [SerializeField] private float _jumpForce = 5;
+    [SerializeField] private float _jumpDelay = 0.2f;
+
+    private Vector3 _direction;
+    private float _rotateY;
+    private float _rotateX;
+    private float _jumpTime;
+
+    private void Start()
     {
-        Move();
+        var camera = Camera.main.transform;
+        camera.parent = _cameraPoint;
+        camera.localRotation = Quaternion.identity;
+        camera.localPosition = Vector3.zero;
     }
 
-    public void SetInput(float inputH, float inputV)
+    private void FixedUpdate()
     {
-        _direction = new Vector3(inputH, 0, inputV).normalized;
+        Move();
+        RotateY();
+    }
+
+    public void SetInput(float inputH, float inputV, float rotateY)
+    {
+        _rotateY += rotateY;
+        _direction = new Vector3(inputH, 0, inputV);
+    }
+
+    public void GetMoveInfo(out Vector3 position, out Vector3 velocity, out float rotateX, out float rotateY)
+    {
+        position = _playerTranform.position;
+        velocity = _rigidbody.velocity;
+
+        rotateX = _head.localEulerAngles.x;
+        rotateY = transform.eulerAngles.y;
+    }
+    public void RotateX(float value)
+    {
+        _rotateX = Mathf.Clamp(_rotateX + value, _minAngle, _maxAngle);
+        _head.localEulerAngles = new Vector3(_rotateX, 0, 0);
+    }
+
+    public void Jump()
+    {
+        if (_checkFly.IsFly) return;
+        if (Time.time - _jumpTime < _jumpDelay) return;
+        
+        _jumpTime = Time.time;
+        _rigidbody.AddForce(Vector3.up * _jumpForce, ForceMode.VelocityChange);
+    }
+
+    private void RotateY()
+    {
+        _rigidbody.angularVelocity = new Vector3(0, _rotateY, 0);
+        _rotateY = 0;
     }
 
     private void Move()
     {
-        _playerTranform.position += _direction * _speed * Time.deltaTime;
-    }
+        //_playerTranform.position += _direction * _speed * Time.deltaTime;
 
-    public Vector3 GetMoveInfo()
-    {
-        return _playerTranform.position;
+        Vector3 velocity = (transform.forward * _direction.z + transform.right * _direction.x).normalized * Speed;
+        velocity.y = _rigidbody.velocity.y;
+
+        _rigidbody.velocity = velocity;
+
+        Velocity = velocity;
     }
 }
