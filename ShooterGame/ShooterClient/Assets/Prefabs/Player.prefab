@@ -353,6 +353,7 @@ GameObject:
   - component: {fileID: 773906767220221327}
   - component: {fileID: 8845640587748697150}
   - component: {fileID: 3560174435623915243}
+  - component: {fileID: 8206047388927465313}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -389,7 +390,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <Speed>k__BackingField: 10
+  <SquattingSpeed>k__BackingField: 0
   _checkFly: {fileID: -5899236381217303399}
+  _characterSquat: {fileID: 8206047388927465313}
   _head: {fileID: 5572283500061501983}
   _cameraPoint: {fileID: 7509990424378036972}
   _playerTranform: {fileID: 7804606649260888945}
@@ -502,6 +505,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _gun: {fileID: 8845640587748697150}
   _animator: {fileID: 7193224516860022407}
+--- !u!114 &8206047388927465313
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1766983307503177995}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d2b442e35da5344487d6664117e46bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _body: {fileID: 2350137828798675584}
+  _head: {fileID: 5572283500061501983}
+  _collider: {fileID: 1566546739971118112}
+  _normalHeadPoisiton: {x: 0, y: -0.02225777, z: 1.234156}
+  _normalBodyPoisiton: {x: 0, y: 0.0779252, z: 0.2442373}
+  _normalBodyRotation: {x: 0, y: 0, z: 0}
+  _normalCenterCollider: {x: 0, y: 0, z: 1}
+  _normalHeightCollider: 2
+  _squatHeadPoisiton: {x: 0, y: -0.2, z: 1}
+  _squatBodyPoisiton: {x: 0, y: 0.45, z: 0.2}
+  _squatBodyRotation: {x: 23, y: 0, z: 0}
+  _squatCenterCollider: {x: 0, y: 0, z: 0.9}
+  _squatHeightCollider: 1.8
 --- !u!1 &1771735684261141882
 GameObject:
   m_ObjectHideFlags: 0

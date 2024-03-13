@@ -85,6 +85,9 @@ public class EnemyController : MonoBehaviour
                 case "rY":
                     _character.SetRotateY((float)change.Value);
                     break;
+                case "s":
+                    _character.SetSquat((bool)change.Value);
+                    break;
                 default:
                     Debug.LogWarning("Что-то пошло не так :)");
                     break;

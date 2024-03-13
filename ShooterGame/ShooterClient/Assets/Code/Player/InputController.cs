@@ -13,6 +13,7 @@ public class InputController : MonoBehaviour
     private float _mouseX;
     private float _mouseY;
     private bool _space;
+    private bool _lCntrl;
     private bool _isShoot;
 
     private void Start()
@@ -28,13 +29,16 @@ public class InputController : MonoBehaviour
         _mouseY = Input.GetAxis("Mouse Y");
 
         _space = Input.GetKeyDown(KeyCode.Space);
+        _lCntrl = Input.GetKey(KeyCode.LeftControl);
 
         _isShoot = Input.GetMouseButton(0);
 
-        _player.SetInput(_rawHorizontal, _rawVertical, _mouseX * _mouseSens);
+        _player.SetInput(_rawHorizontal, _rawVertical, _mouseX * _mouseSens, _lCntrl);
         _player.RotateX(-_mouseY * _mouseSens);
 
         if(_space) _player.Jump();
+        if (Input.GetKeyDown(KeyCode.LeftControl)) _player.Squat(true);
+        if (Input.GetKeyUp(KeyCode.LeftControl)) _player.Squat(false);
 
         if (_isShoot && _playerGun.TryShoot(out ShootInfo info))
         {
@@ -54,7 +58,7 @@ public class InputController : MonoBehaviour
 
     private void SendMove()
     {
-        _player.GetMoveInfo(out Vector3 position, out Vector3 velocity, out float rotateX, out float rotateY);
+        _player.GetMoveInfo(out Vector3 position, out Vector3 velocity, out float rotateX, out float rotateY, out bool squat);
 
         Dictionary<string, object> data = new Dictionary<string, object>()
         {
@@ -67,7 +71,9 @@ public class InputController : MonoBehaviour
             {"vZ", velocity.z},
 
             { "rX", rotateX },
-            { "rY", rotateY }
+            { "rY", rotateY },
+
+            { "s", squat }
         };
 
         _multiplayerManager.SendMessage("move", data);

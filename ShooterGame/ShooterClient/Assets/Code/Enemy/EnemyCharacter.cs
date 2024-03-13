@@ -1,9 +1,9 @@
-using UnityEditor;
 using UnityEngine;
 
 public class EnemyCharacter : Character
 {
     [SerializeField] private Transform _head;
+    [SerializeField] private PlayerSquat _characterSquat;
     public Vector3 TargetPosition { get; private set; }
     private float _velocityMagnitude;
 
@@ -42,5 +42,10 @@ public class EnemyCharacter : Character
         TargetPosition = position + velocity * averageInterval;
         _velocityMagnitude = velocity.magnitude;
         Velocity = velocity;
+    }
+
+    public void SetSquat(bool value)
+    {
+        _characterSquat.Squat(value);
     }
 }

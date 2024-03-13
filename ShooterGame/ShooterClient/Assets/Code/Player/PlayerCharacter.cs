@@ -3,6 +3,7 @@ using UnityEngine;
 public class PlayerCharacter : Character
 {
     [SerializeField] private CheckFly _checkFly;
+    [SerializeField] private PlayerSquat _characterSquat;
     [SerializeField] private Transform _head;
     [SerializeField] private Transform _cameraPoint;
     [SerializeField] private Transform _playerTranform;
@@ -18,6 +19,8 @@ public class PlayerCharacter : Character
     private float _rotateX;
     private float _jumpTime;
 
+    private bool _squat;
+
     private void Start()
     {
         var camera = Camera.main.transform;
@@ -32,24 +35,32 @@ public class PlayerCharacter : Character
         RotateY();
     }
 
-    public void SetInput(float inputH, float inputV, float rotateY)
+    public void SetInput(float inputH, float inputV, float rotateY, bool squat)
     {
         _rotateY += rotateY;
         _direction = new Vector3(inputH, 0, inputV);
     }
 
-    public void GetMoveInfo(out Vector3 position, out Vector3 velocity, out float rotateX, out float rotateY)
+    public void GetMoveInfo(out Vector3 position, out Vector3 velocity, out float rotateX, out float rotateY, out bool squat)
     {
         position = _playerTranform.position;
         velocity = _rigidbody.velocity;
 
         rotateX = _head.localEulerAngles.x;
         rotateY = transform.eulerAngles.y;
+        squat = _squat;
     }
+
     public void RotateX(float value)
     {
         _rotateX = Mathf.Clamp(_rotateX + value, _minAngle, _maxAngle);
         _head.localEulerAngles = new Vector3(_rotateX, 0, 0);
+    }
+
+    public void Squat(bool value)
+    {
+        _squat = value;
+        _characterSquat.Squat(value);
     }
 
     public void Jump()
