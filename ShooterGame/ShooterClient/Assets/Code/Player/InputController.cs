@@ -13,7 +13,6 @@ public class InputController : MonoBehaviour
     private float _mouseX;
     private float _mouseY;
     private bool _space;
-    private bool _lCntrl;
     private bool _isShoot;
 
     private void Start()
@@ -29,11 +28,9 @@ public class InputController : MonoBehaviour
         _mouseY = Input.GetAxis("Mouse Y");
 
         _space = Input.GetKeyDown(KeyCode.Space);
-        _lCntrl = Input.GetKey(KeyCode.LeftControl);
 
         _isShoot = Input.GetMouseButton(0);
 
-        _player.SetInput(_rawHorizontal, _rawVertical, _mouseX * _mouseSens, _lCntrl);
         _player.RotateX(-_mouseY * _mouseSens);
 
         if(_space) _player.Jump();

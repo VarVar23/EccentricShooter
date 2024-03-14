@@ -3,7 +3,7 @@ using UnityEngine;
 public class PlayerCharacter : Character
 {
     [SerializeField] private CheckFly _checkFly;
-    [SerializeField] private PlayerSquat _characterSquat;
+    [SerializeField] private CharacterSquat _characterSquat;
     [SerializeField] private Transform _head;
     [SerializeField] private Transform _cameraPoint;
     [SerializeField] private Transform _playerTranform;
@@ -35,7 +35,7 @@ public class PlayerCharacter : Character
         RotateY();
     }
 
-    public void SetInput(float inputH, float inputV, float rotateY, bool squat)
+    public void SetInput(float inputH, float inputV, float rotateY)
     {
         _rotateY += rotateY;
         _direction = new Vector3(inputH, 0, inputV);

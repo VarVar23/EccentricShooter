@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlayerSquat : MonoBehaviour
+public class CharacterSquat : MonoBehaviour
 {
     [SerializeField] private Transform _body;
     [SerializeField] private Transform _head;

@@ -3,7 +3,7 @@ using UnityEngine;
 public class EnemyCharacter : Character
 {
     [SerializeField] private Transform _head;
-    [SerializeField] private PlayerSquat _characterSquat;
+    [SerializeField] private CharacterSquat _characterSquat;
     public Vector3 TargetPosition { get; private set; }
     private float _velocityMagnitude;
 
