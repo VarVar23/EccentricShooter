@@ -26,10 +26,13 @@ public class EnemyController : MonoBehaviour
 
     private float _lastTime = 0;
 
-    public void Init(Player player)
+    public void Init(string key, Player player)
     {
+        _character.Init(key);
+
         _player = player;
         _character.SetSpeed(_player.speed);
+        _character.SetMaxHp(_player.maxHp);
         player.OnChange += OnChange;
     }
 
@@ -87,6 +90,15 @@ public class EnemyController : MonoBehaviour
                     break;
                 case "s":
                     _character.SetSquat((bool)change.Value);
+                    break;
+                case "loss":
+                    MultiplayerManager.Instance.LossCounter.SetEnemyLoss((byte)change.Value);
+                    break;
+                case "currentHp":
+                    if((sbyte)change.Value > (sbyte)change.PreviousValue)
+                    {
+                        _character.RestoreHp((sbyte)change.Value);
+                    }
                     break;
                 default:
                     Debug.LogWarning("Что-то пошло не так :)");

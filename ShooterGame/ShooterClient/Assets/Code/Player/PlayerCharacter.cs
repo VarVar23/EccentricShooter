@@ -1,7 +1,11 @@
+using Colyseus.Schema;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerCharacter : Character
 {
+    [SerializeField] private Health _health;
     [SerializeField] private CheckFly _checkFly;
     [SerializeField] private CharacterSquat _characterSquat;
     [SerializeField] private Transform _head;
@@ -27,6 +31,9 @@ public class PlayerCharacter : Character
         camera.parent = _cameraPoint;
         camera.localRotation = Quaternion.identity;
         camera.localPosition = Vector3.zero;
+
+        _health.SetMax(MaxHealth);
+        _health.SetCurrent(MaxHealth);
     }
 
     private void FixedUpdate()
@@ -34,6 +41,26 @@ public class PlayerCharacter : Character
         Move();
         RotateY();
     }
+
+    internal void OnChange(List<DataChange> changes)
+    {
+        foreach (DataChange change in changes)
+        {
+            switch (change.Field)
+            {
+                case "currentHp":
+                    _health.SetCurrent((sbyte)change.Value);
+                    break;
+                case "loss":
+                    MultiplayerManager.Instance.LossCounter.SetPlayerLoss((byte)change.Value);
+                    break;
+                default:
+                    Debug.LogWarning("Что-то пошло не так :)");
+                    break;
+            }
+        }
+    }
+
 
     public void SetInput(float inputH, float inputV, float rotateY)
     {
@@ -80,8 +107,6 @@ public class PlayerCharacter : Character
 
     private void Move()
     {
-        //_playerTranform.position += _direction * _speed * Time.deltaTime;
-
         Vector3 velocity = (transform.forward * _direction.z + transform.right * _direction.x).normalized * Speed;
         velocity.y = _rigidbody.velocity.y;
 
