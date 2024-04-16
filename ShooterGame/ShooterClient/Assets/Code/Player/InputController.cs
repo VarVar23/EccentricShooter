@@ -4,15 +4,20 @@ using UnityEngine;
 
 public class InputController : MonoBehaviour
 {
+    public PlayerGun PlayerGun;
+
     [SerializeField] private PlayerCharacter _player;
-    [SerializeField] private PlayerGun _playerGun;
+    [SerializeField] private PlayerChangeWeapon _playerChangeWeapons;
     [SerializeField] private float _restartDelay = 3;
     [SerializeField] private float _mouseSens;
+
     private MultiplayerManager _multiplayerManager;
+    private SpawnPoints _spawnPoints;
     private float _rawHorizontal;
     private float _rawVertical;
     private float _mouseX;
     private float _mouseY;
+    private float _mouseScroll;
     private bool _space;
     private bool _isShoot;
     private bool _hold = false;
@@ -20,6 +25,7 @@ public class InputController : MonoBehaviour
     private void Start()
     {
         _multiplayerManager = MultiplayerManager.Instance;
+        _spawnPoints = FindObjectOfType<SpawnPoints>();
     }
 
     private void Update()
@@ -30,6 +36,7 @@ public class InputController : MonoBehaviour
         _rawVertical = Input.GetAxisRaw("Vertical");
         _mouseX = Input.GetAxis("Mouse X");
         _mouseY = Input.GetAxis("Mouse Y");
+        _mouseScroll = Input.GetAxis("Mouse ScrollWheel");
 
         _space = Input.GetKeyDown(KeyCode.Space);
 
@@ -37,12 +44,13 @@ public class InputController : MonoBehaviour
 
         _player.RotateX(-_mouseY * _mouseSens);
         _player.SetInput(_rawHorizontal, _rawVertical, _mouseX * _mouseSens);
+        _playerChangeWeapons.ChangeWeapon(_mouseScroll);
 
-        if(_space) _player.Jump();
+        if (_space) _player.Jump();
         if (Input.GetKeyDown(KeyCode.LeftControl)) _player.Squat(true);
         if (Input.GetKeyUp(KeyCode.LeftControl)) _player.Squat(false);
 
-        if (_isShoot && _playerGun.TryShoot(out ShootInfo info))
+        if (_isShoot && PlayerGun.TryShoot(out ShootInfo info))
         {
             SendShoot(ref info);
         }
@@ -83,19 +91,21 @@ public class InputController : MonoBehaviour
 
     public void Restart(string jsonRestartInfo)
     {
-        Debug.Log("–≈—“¿–“!!");
-        RestartInfo info = JsonUtility.FromJson<RestartInfo>(jsonRestartInfo);
+        //RestartInfo info = JsonUtility.FromJson<RestartInfo>(jsonRestartInfo);
 
         StartCoroutine(Hold());
 
-        _player.transform.position = new Vector3(info.x, 0, info.z);
+        //_player.transform.position = new Vector3(info.x, 0, info.z);
+        int randomID = UnityEngine.Random.Range(0, _spawnPoints.SpawnPointsTransform.Length);
+
+        _player.transform.position = _spawnPoints.SpawnPointsTransform[randomID].position;
         _player.SetInput(0, 0, 0);
 
         Dictionary<string, object> data = new Dictionary<string, object>()
         {
-            {"pX", info.x },
-            {"pY", 0 },
-            {"pZ", info.z },
+            {"pX", _player.transform.position.x },
+            {"pY", _player.transform.position.y },
+            {"pZ", _player.transform.position.z },
 
             {"vX", 0},
             {"vY", 0},

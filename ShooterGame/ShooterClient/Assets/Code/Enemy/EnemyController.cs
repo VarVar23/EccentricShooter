@@ -4,8 +4,11 @@ using UnityEngine;
 
 public class EnemyController : MonoBehaviour
 {
+    public EnemyGun EnemyGun;
+
     [SerializeField] private EnemyCharacter _character;
-    [SerializeField] private EnemyGun _enemyGun;
+    [SerializeField] private EnemyChangeWeapon _changeWeapon;
+
     private Player _player;
     private List<float> _timeInterval = new List<float>() { 0, 0, 0, 0, 0 };
     private float AverageInterval
@@ -26,6 +29,8 @@ public class EnemyController : MonoBehaviour
 
     private float _lastTime = 0;
 
+    public void ChangeWeapon(string number) => _changeWeapon.ChangeWeapon(number);
+
     public void Init(string key, Player player)
     {
         _character.Init(key);
@@ -41,7 +46,7 @@ public class EnemyController : MonoBehaviour
         Vector3 position = new Vector3(info.pX, info.pY, info.pZ);
         Vector3 velocity = new Vector3(info.dX, info.dY, info.dZ);
 
-        _enemyGun.Shoot(position, velocity);
+        EnemyGun.Shoot(position, velocity);
     }
 
     public void Destroy()

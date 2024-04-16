@@ -94,6 +94,8 @@ public class MultiplayerManager : ColyseusManager<MultiplayerManager>
 
         enemy.Init(key, player);
 
+        _room.OnMessage<string>("ChangeWeapon", enemy.ChangeWeapon);
+
         _enemies.Add(key, enemy);
     }
 

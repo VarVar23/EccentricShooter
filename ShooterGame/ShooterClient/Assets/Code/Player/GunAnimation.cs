@@ -13,6 +13,7 @@ public class GunAnimation : MonoBehaviour
     private void Shoot()
     {
         _animator.SetTrigger("shoot");
+        Debug.Log("Выстрел");
     }
 
     private void OnDestroy() => _gun.ShootAction -= Shoot;
